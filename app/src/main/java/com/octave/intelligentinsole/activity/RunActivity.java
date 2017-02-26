@@ -26,7 +26,7 @@ public class RunActivity extends BaseActivity {
     @Bind(R.id.tv_run_steps)
     TextView tvRunSteps;
     @Bind(R.id.tv_run_history)
-    TextView tvRunHistory;
+    Button tvRunHistory;
     @Bind(R.id.btn_run_switch)
     Button btnRunSwitch;
     @Bind(R.id.ll_run_btngroup)
@@ -62,7 +62,7 @@ public class RunActivity extends BaseActivity {
     }
 
     @Override
-    public void initData() {
+    public void initData(Bundle parms) {
 //        tvRunTime.setText("00:00:00");
         tvRunDistance.setText("0.0");
         tvRunSteps.setText("0");
@@ -85,8 +85,7 @@ public class RunActivity extends BaseActivity {
         Intent intent;
         switch (view.getId()) {
             case R.id.tv_run_history:
-                intent = new Intent(RunActivity.this, HistoryActivity.class);
-                startActivity(intent);
+                startActivity(HistoryActivity.class);
                 break;
             case R.id.btn_run_switch:
                 if (!isStart) {
@@ -124,10 +123,4 @@ public class RunActivity extends BaseActivity {
         }
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        // TODO: add setContentView(...) invocation
-        ButterKnife.bind(this);
-    }
 }

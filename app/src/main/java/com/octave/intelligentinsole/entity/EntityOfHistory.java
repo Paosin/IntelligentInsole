@@ -3,11 +3,14 @@ package com.octave.intelligentinsole.entity;
 import com.octave.intelligentinsole.R;
 import com.octave.intelligentinsole.utils.TimeUtils;
 
+import java.io.Serializable;
+
 /**
  * Created by Paosin Von Scarlet on 2017/2/15.
  */
 
-public class EntityOfHistory {
+public class EntityOfHistory  implements Serializable {
+    private static final long serialVersionUID = -7640467242182151398L;
     private int steps;
     private long startTime;// yyyy:MM:dd hh:mm:ss
     private long duration;// **/s

@@ -13,9 +13,11 @@ import android.graphics.PorterDuff;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Handler;
 import android.support.annotation.ColorInt;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -33,7 +35,10 @@ import java.util.List;
  */
 
 public class DrawPressurePath extends SurfaceView implements SurfaceHolder.Callback, Runnable {
+    private static final String TAG = "DrawPressurePath";
     public static Handler handler;
+
+    //region 成员变量
     //压力中心线绘图模式，点或线
     private final int DRAW_POINT = 0;
     private final int DRAW_LINE = 1;
@@ -62,16 +67,11 @@ public class DrawPressurePath extends SurfaceView implements SurfaceHolder.Callb
     private static float RECT_LENGTH = 46f;
     private boolean isFlipHorizonta;
     private DrawRects[] mRects;
-//    private int mRectColor = Color.WHITE;
-//    private int mRectPosition = -1;
-//    public void setmRectColor(int mRectColor,int mRectPosition) {
-//        this.mRectColor = mRectColor;
-//        this.mRectPosition = mRectPosition;
-//    }
 
     //要绘制的背景图片
     private Bitmap mBitmap;
-    private Drawable mDrawable;
+    private Drawable mDrawable = null;
+    private LayerDrawable mDrawables;
     //-----------------------------
     //读取Excel的工具
 //    private FileTools file = new FileTools();
@@ -86,6 +86,7 @@ public class DrawPressurePath extends SurfaceView implements SurfaceHolder.Callb
     //线程开关
     private boolean isRunning;
     private Matrix mMatrix;
+    //endregion
 
     public DrawPressurePath(Context context) {
         this(context, null);
@@ -93,6 +94,8 @@ public class DrawPressurePath extends SurfaceView implements SurfaceHolder.Callb
 
     public DrawPressurePath(Context context, AttributeSet attrs) {
         super(context, attrs);
+        if (!isInEditMode())
+            mDrawables = (LayerDrawable) getBackground();
 
         mHolder = getHolder();
         mHolder.setFormat(PixelFormat.TRANSLUCENT);
@@ -116,7 +119,8 @@ public class DrawPressurePath extends SurfaceView implements SurfaceHolder.Callb
             TypedArray array = null;
             try {
                 array = getContext().obtainStyledAttributes(attrs, R.styleable.DrawPressurePath);
-                mDrawable = array.getDrawable(R.styleable.DrawPressurePath_backgroundsrc);
+                //TODO:现在不适用Drawable来绘制背景，直接用android:background设置
+//                mDrawable = array.getDrawable(R.styleable.DrawPressurePath_backgroundsrc);
 //                mFilePath = array.getString(R.styleable.DrawPressurePath_filepath);
                 //dp,sp都会乘desity,px直接等于
                 mDimension = (int) array.getDimension(R.styleable.DrawPressurePath_lineweight, 6);
@@ -314,7 +318,8 @@ public class DrawPressurePath extends SurfaceView implements SurfaceHolder.Callb
             try {
                 mCanvas = mHolder.lockCanvas();
                 mCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-                drawBitmap();
+                //TODO:现在不用绘制背景了
+//                drawBitmap();
                 //如果没有数据就不绘制
                 if (data.size() != 0) {
                     if (mDrawMode == DRAW_LINE)
@@ -322,12 +327,22 @@ public class DrawPressurePath extends SurfaceView implements SurfaceHolder.Callb
                     else
                         drawPoint();
                 }
-                if (mRects != null)
-                    drawRect();
+//                if (mRects != null)
+//                    drawRect();
             } finally {
                 if (mCanvas != null)
                     mHolder.unlockCanvasAndPost(mCanvas);
             }
+        }
+    }
+
+    public void initPressureColor(float[] pressure) {
+        DrawPressureColor[] drawlist = new DrawPressureColor[pressure.length];
+        for (int i = 0; i < pressure.length; i++) {
+            drawlist[i] = new DrawPressureColor(pressure[i]);
+            Drawable drawable = mDrawables.getDrawable(i);
+            if (drawable != null)
+                drawable.setColorFilter(drawlist[i].getColor(), PorterDuff.Mode.SRC_IN);
         }
     }
 
@@ -379,22 +394,13 @@ public class DrawPressurePath extends SurfaceView implements SurfaceHolder.Callb
         } catch (Exception e) {
             Snackbar.make(getRootView(), e.toString(), Snackbar.LENGTH_SHORT).show();
         }
-//        for (int i = 0; i < mRects.length; i++) {
-//            if(i!=mRectPosition) {
-//                mGesturePaint.setColor(Color.WHITE);
-//                mCanvas.drawRect(mRects[i], mGesturePaint);
-//            }
-//            else{
-//                mGesturePaint.setColor(mRectColor);
-//                mCanvas.drawRect(mRects[i],mGesturePaint);
-//            }
-//        }
     }
 
 
     //测量Drawable长宽
     private void measureDrawable() {
-        if (mDrawable == null) {
+        //TODO:因为不用绘制背景，所以直接测量layer-list
+        if (mDrawables == null) {
             throw new RuntimeException("drawable 不能为空");
         }
     }
@@ -441,6 +447,55 @@ public class DrawPressurePath extends SurfaceView implements SurfaceHolder.Callb
         return bitmap;
     }
 
+    public class DrawPressureColor {
+        private float pressure;
+        @ColorInt
+        private int color;
+
+        public DrawPressureColor(float pressure) {
+            this.pressure = pressure;
+            this.color = getColorFromPressure(this.pressure);
+        }
+
+        public float getPressure() {
+            return pressure;
+        }
+
+        public void setPressure(float pressure) {
+            this.pressure = pressure;
+        }
+
+        @ColorInt
+        public int getColor() {
+            return color;
+        }
+
+        private int getResColor(int resId) {
+            return ContextCompat.getColor(getContext(), resId);
+        }
+
+        @ColorInt
+        private int getColorFromPressure(float f) {
+            @ColorInt int c;
+            if (f == 0)
+                c = getResColor(R.color.defaultpressurecolor);
+            else if (f < 2)
+                c = getResColor(R.color.navajowhite);
+            else if (f < 4)
+                c = getResColor(R.color.gold);
+            else if (f < 6)
+                c = getResColor(R.color.hotpink);
+            else if (f < 10)
+                c = getResColor(R.color.tomato);
+            else if (f < 15)
+                c = getResColor(R.color.red);
+            else
+                c = getResColor(R.color.coral);
+            return c;
+        }
+
+    }
+
     public class DrawRects {
         private RectF rect;
         private float pressure;
@@ -475,7 +530,7 @@ public class DrawPressurePath extends SurfaceView implements SurfaceHolder.Callb
         }
 
         private int getResColor(int resId) {
-            return getContext().getResources().getColor(resId);
+            return ContextCompat.getColor(getContext(), resId);
         }
 
         @ColorInt

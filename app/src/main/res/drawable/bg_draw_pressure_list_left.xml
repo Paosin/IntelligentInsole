@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/leftfoot_1" />
+    <item android:drawable="@drawable/leftfoot_2" />
+    <item android:drawable="@drawable/leftfoot_3" />
+    <item android:drawable="@drawable/leftfoot_4" />
+    <item android:drawable="@drawable/leftfoot_5" />
+    <item android:drawable="@drawable/leftfoot_6" />
+    <item android:drawable="@drawable/leftfoot_7" />
+    <item android:drawable="@drawable/leftfoot_8" />
+    <item android:drawable="@drawable/leftfoot_9" />
+</layer-list>

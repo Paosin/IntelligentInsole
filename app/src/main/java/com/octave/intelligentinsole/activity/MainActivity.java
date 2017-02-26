@@ -1,6 +1,7 @@
 package com.octave.intelligentinsole.activity;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -76,7 +77,7 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
-    public void initData() {
+    public void initData(Bundle parms) {
         list = new ArrayList<Lv0EntityOfMain>();
         Lv0EntityOfMain data = new Lv0EntityOfMain(R.drawable.ic_walk, "设备连接", R.drawable.ic_chevron_right);
         list.add(data);
@@ -116,8 +117,7 @@ public class MainActivity extends BaseActivity {
 
     @OnClick(R.id.fab)
     public void onClick() {
-        Intent intent = new Intent(MainActivity.this, RunActivity.class);
-        startActivity(intent);
+        startActivity(RunActivity.class);
     }
 
     private ArrayList<MultiItemEntity> generateData() {
@@ -129,7 +129,7 @@ public class MainActivity extends BaseActivity {
         lv0 = new Lv0EntityOfMain(R.drawable.ic_walk, "今日活动", R.drawable.ic_chevron_right);
         lv1 = new Lv1EntityOfMain(R.drawable.ic_walk, "坐", R.drawable.ic_chevron_right, EvaluationParamActivity.class);
         lv0.addSubItem(lv1);
-        lv1 = new Lv1EntityOfMain(R.drawable.ic_walk, "行走", R.drawable.ic_chevron_right, null);
+        lv1 = new Lv1EntityOfMain(R.drawable.ic_walk, "行走", R.drawable.ic_chevron_right, TestActivity.class);
         lv0.addSubItem(lv1);
         lv1 = new Lv1EntityOfMain(R.drawable.ic_walk, "上楼梯", R.drawable.ic_chevron_right, null);
         lv0.addSubItem(lv1);

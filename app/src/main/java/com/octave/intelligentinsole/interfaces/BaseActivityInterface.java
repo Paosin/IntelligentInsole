@@ -1,5 +1,6 @@
 package com.octave.intelligentinsole.interfaces;
 
+import android.os.Bundle;
 import android.view.View;
 
 /**
@@ -23,7 +24,7 @@ public interface BaseActivityInterface {
     /**
      * 初始化界面数据
      */
-    void initData();
+    void initData(Bundle parms);
 
     /**
      * 绑定监听器与适配器

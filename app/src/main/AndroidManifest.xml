@@ -20,11 +20,11 @@
         </activity>
         <activity android:name=".activity.RunActivity" />
         <activity android:name=".activity.HistoryActivity" />
-        <activity android:name=".activity.LineDependColumnActivity"
-            android:theme="@style/Theme.AppCompat.Transparent">
-
-        </activity>
-        <activity android:name=".activity.EvaluationParamActivity"></activity>
+        <activity
+            android:name=".activity.LineDependColumnActivity"
+            android:theme="@style/Theme.AppCompat.Transparent"></activity>
+        <activity android:name=".activity.EvaluationParamActivity" />
+        <activity android:name=".activity.TestActivity"></activity>
     </application>
 
 </manifest>
